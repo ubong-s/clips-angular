@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { AuthService } from 'src/app/services/auth.service';
+import IUser from 'src/app/models/user.model';
 
 @Component({
   selector: 'app-register',
@@ -10,6 +12,7 @@ export class RegisterComponent {
   showAlert = false;
   alertMsg = 'Please wait! Your account is being created';
   alertColor = 'blue';
+  inSubmission = false;
 
   registerForm = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),
@@ -33,9 +36,30 @@ export class RegisterComponent {
     ]),
   });
 
-  register() {
+  constructor(private auth: AuthService) {}
+
+  async register() {
     this.showAlert = true;
     this.alertMsg = 'Please wait! Your account is being created';
     this.alertColor = 'blue';
+    this.inSubmission = true;
+
+    try {
+      await this.auth.createUser({
+        ...this.registerForm.value,
+        age: Number(this.registerForm.value.age),
+      } as IUser);
+    } catch (error) {
+      console.log(error);
+
+      this.alertMsg = 'An unexpected error occured.Please try again later';
+      this.alertColor = 'red';
+      this.inSubmission = false;
+
+      return;
+    }
+
+    this.alertMsg = 'Success, your ccount has been created';
+    this.alertColor = 'green';
   }
 }
