@@ -1,0 +1,5 @@
+{
+  "firebase": {
+    "target": "https://firebasestorage.googleapis.com"
+  }
+}
